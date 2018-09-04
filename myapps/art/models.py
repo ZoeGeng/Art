@@ -25,20 +25,30 @@ class Art(models.Model):
                            imagePath='art/u_images/',
                            filePath='art/u_files/',
                            toolbars='full',
-                           blank=True)
+                           blank=True,
+                           null=True)
     author = models.CharField(max_length=50,
                               verbose_name='作者')
     publish_time = models.DateTimeField(verbose_name='发布时间',
                                         auto_now_add=True)
 
     category = models.ForeignKey(Category,
+                                 related_name='arts',
                                  on_delete=models.CASCADE,
                                  verbose_name='分类')
     #upload_to指定图片路径是相对于MEDIA_ROOT
     cover = models.ImageField(verbose_name='封面',
                               upload_to='art/images/',
                               null=True)
+
+
     def __str__(self):
+        return self.title
+
+    @property
+    def shortTitle(self):
+        if len(self.title) > 8:
+            return self.title[0:8] + ".."
         return self.title
 
     class Meta:

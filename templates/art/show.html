@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}
+    {{ art.title }} - 小读者
+{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="/static/art/css/art.css">
+{% endblock %}
+{% block content %}
+
+    <div class="row">
+        <div class="col-xs-9">
+            <div class="art_content">
+                <h3 class="text-center">{{ art.title }}</h3>
+                <div class="row">
+                    <div class="col-xs-4">
+                        <img src="/static/uploads/{{ art.cover }}"
+                             width="160px" height="200px">
+                    </div>
+                    <div class="col-xs-8">
+                        <p>作者： {{ art.author }}</p>
+                        <p>发布时间： {{ art.publish_time|date:'Y:m:d H:i:s' }}</p>
+                        <p>介绍： {{ art.content|safe }}</p>
+                    </div>
+                </div>
+                <div style="padding: 10px" class="text-right">
+                    <a id="advanceBtn" class="btn btn-success"
+                       onclick="advanceArt('{{ art.id }}')">抢读</a>
+                    <a class="btn btn-danger">购买</a>
+                    <a class="btn btn-primary">加入书架</a>
+                </div>
+            </div>
+
+        </div>
+        <div class="col-xs-3 col-xs-push-1">
+            <div class="art_content">
+                <h4>阅读排行</h4>
+                <div id="rank_top">
+                    <ul>
+                        {% for topArt, score in rankArtTop %}
+                            <li><a href="/art/show/{{ topArt.id }}/" class="btn btn-link"><span>{{ topArt.shortTitle }}</span>></a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+
+{% block js %}
+    <script src="/static/art/js/art.js"></script>
+{% endblock %}

@@ -12,7 +12,7 @@ class BaseSetting:
 
 class GlobalSettings:
     site_title = '文章后台管理系统'
-    site_footer = '@<span style="font-size color:blue;">千峰教育</span><a class="btn btn-danger">zzpython1802'
+    site_footer = '@<span style="font-size color:blue;">Geng</span><a class="btn btn-danger">zzpython1802'
     menu_style = 'accordion'
 
     globals_search_models = [Art,Category]

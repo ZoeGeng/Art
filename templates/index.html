@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block title %}
+    主页
+{% endblock %}
+{% block css %}
+    <link rel="stylesheet" href="/static/index/css/index.css">
+{% endblock %}
+{% block content %}
+
+    <div class="row">
+        <span class="col-xs-2" style="font-size: 20px">分类标签:</span>
+        <ul class="col-xs-8">
+            <li><a href="/" class="btn {% if cateId == 0 %}btn-danger  {% else %} btn-info {% endif %}">所有分类</a></li>
+            {% for cate in cates %}
+                <li><a href="/?cate={{ cate.id }}" class="btn {% if cateId == cate.id %} btn-danger  {% else %} btn-info {% endif %}">{{ cate.name }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+    <ul class="row">
+        {% for art in pager.object_list %}
+            <li>
+                <dl>
+                    <dt>
+                        <img src="/static/uploads/{{ art.cover|default:'art/images/0.jpg' }}"
+                             width="120"
+                             height="140">
+                    </dt>
+                    <dd>{{ art.shortTitle }}</dd>
+                    <dd>作者：{{ art.author }}</dd>
+                    <dd><a href="/art/show/{{ art.id }}/" class="btn btn-primary">阅读</a></dd>
+                </dl>
+            </li>
+        {% endfor %}
+    </ul>
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            {% if pager.has_previous %}
+                <li>
+                    <a href="/?page={{ pager.previous_page_number }}&cate={{ cateId }}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+            {% endif %}
+
+            {% for page in paginator.page_range %}
+                {% if forloop.counter == pager.number %}
+                    <li class="active">
+                    {% else %}
+                     <li>
+                {% endif %}
+
+                <a href="/?page={{ page }}&cate={{ cateId }}">{{ page }}</a></li>
+            {% endfor %}
+
+            {% if pager.has_next %}
+                <li>
+                    <a href="/?page={{ pager.next_page_number }}&cate={{ cateId }}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+
+{% endblock %}

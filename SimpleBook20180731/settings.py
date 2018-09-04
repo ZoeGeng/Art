@@ -14,6 +14,8 @@ import os
 import sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+import djcelery
+from celery.schedules import crontab, timedelta
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 sys.path.insert(0, os.path.join(BASE_DIR,'myapps'))
@@ -43,7 +45,10 @@ INSTALLED_APPS = [
     'art',
     'xadmin',
     'crispy_forms',
-    'DjangoUeditor'
+    'DjangoUeditor',
+    'user',
+    'djcelery',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -134,4 +139,87 @@ STATICFILES_DIRS = [
 MEDIA_ROOT = os.path.join(BASE_DIR, 'static/uploads')
 #配置访问媒体文件的URL
 MEDIA_URL = '/static/uploads/'
+
+CACHES = {
+    'default':{
+        'BACKEND':'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://127.0.0.1/3',
+        'OPTIONS':{
+            'CLIENT_CLASS':'django_redis.client.DefaultClient'
+        }
+    }
+}
+
+#配置Session
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+#使用缓存
+REDIS_CACHE = {
+    'host':'127.0.0.1',
+    'db':3,
+    'port':6379,
+}
+
+
+#配置celery
+
+
+djcelery.setup_loader()
+BROKER_URL = 'redis://127.0.0.1:6379/5'
+CELERY_IMPORTS = ('art.tasks',)#初始导入celery位置
+CELERY_TIMEZONE = 'Asia/Shanghai' #时区
+#配置任务定时队列存储的位置
+CELERYBEAT_SCHEDULER = 'djcelery.schedulers.DatabaseScheduler'
+
+#配置定时任务
+CELERYBEAT_SCHEDULE = {
+    u'定时发邮件':{
+        'task': 'art.tasks.sendEmailLog',
+        'schedule': timedelta(seconds=10),
+        'args':(),
+    }
+}
+
+
+# --配置日志--
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters':{
+        'simple':{
+                'format':'[%(asctime)s]->%(module)s/%(funcName)s:%(message)s',
+                'datefmt': '%Y-%m-%d %H:%M:%S'
+        },
+    },
+    'handlers':{
+        'console':{
+            'level':'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
+        },
+        'logFile':{
+            'level':'INFO',
+            'class':'logging.handlers.RotatingFileHandler',
+            'formatter':'simple',
+            'filename': 'mart.log',
+        }
+
+    },
+    'loggers':{ #日志记录器
+        'info':{
+            'handlers':('console','logFile'),
+            'level':'INFO',
+            'propagate':False
+
+        }
+    }
+}
+
+#设置Django_REST_Framework
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES':[
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ]
+}
+
+
 

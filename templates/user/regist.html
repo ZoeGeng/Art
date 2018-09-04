@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% block title %}
+    用户注册页面
+{% endblock %}
+{% block content %}
+
+    <form class="form form-horizontal col-xs-offset-2"
+          method="post"
+          action="/user/regist/">
+
+        {% csrf_token %}
+        <input name="photo" type="hidden" value="{{ form.photo.value }}">
+        <div class="form-group">
+            <label class="col-xs-3 col-xs-push-1">用户名</label>
+            <div class="col-xs-7">
+                <input class="form-control" name="username" value="{{ form.username.value }}">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-xs-3 col-xs-push-1">口令</label>
+            <div class="col-xs-7">
+                <input class="form-control" name="password" type="password">
+            </div>
+
+        </div>
+        <div class="form-group">
+            <label class="col-xs-3 col-xs-push-1">重复口令</label>
+            <div class="col-xs-7">
+                <input class="form-control" name="password2" type="password">
+            </div>
+
+        </div>
+
+        <div class="form-group">
+            <label class="col-xs-3 col-xs-push-1">邮箱</label>
+            <div class="col-xs-7">
+                <input class="form-control" name="email" value="{{ form.email.value }}">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-xs-3 col-xs-push-1">电话</label>
+            <div class="col-xs-7">
+                <input class="form-control" name="phone"  value="{{ form.phone.value }}" >
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-xs-3 col-xs-push-1">头像</label>
+            <div class="col-xs-7">
+                <img id="preImg" src="{{ form.photo.value|default:'/static/users/imgs/1.jpg' }}" width="100px" height="120px"
+                onclick="selectImage.click()">
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <div class="col-xs-7 col-xs-offset-3">
+                <button class="btn btn-primary">注册</button>
+                <a class="btn btn-link" href="/user/login/">已注册用户，去登录</a>
+            </div>
+        </div>
+
+        {% if form.errors %}
+            <div class="col-xs-7 col-xs-offset-3" style="color: red;">
+                <ul>
+                    {% for field_name,msgs in errors_json.items %}
+                        <li>{{ msgs.0.message }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+    </form>
+
+    <input type="file" id="selectImage" style="display: none;"
+    onchange="uploadImage(this.files[0])">
+
+
+
+{% endblock %}
+
+{% block js %}
+    <script>
+    function uploadImage(imgFile){
+        alert("正在上传图片："+imgFile.name);
+        var url = '/user/upload/';//上传文件的接口
+        var fd = new FormData();//将上传的图片封装到formdata中
+        fd.append('u_img',imgFile);
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', url,true); //打开接口
+        xhr.onload = function(ev){
+            //判断请求是否成功
+            if(xhr.status==200 && xhr.readyState== 4){
+                alert(xhr.responseText); //打印响应的文本数据
+                //将响应的文本转为json对象
+                //将json 对象转为字符串 json.stringify
+                data = JSON.parse(xhr.responseText);
+                $('#preImg').attr('src',data.path);
+                //将上传的图片路径写入注册表单中
+                $('input[name="photo"]').val(data.path)
+
+            }
+        }
+
+        xhr.send(fd)
+
+    }
+    </script>
+{% endblock %}
